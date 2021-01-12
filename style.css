@@ -1,0 +1,13 @@
+body {
+  margin: 0px;
+  padding: 0px;
+  height: 100vh;
+}
+
+.scrolling-x {
+  overflow-x: scroll;
+}
+
+.scrolling-y {
+  overflow-y: auto;
+}
