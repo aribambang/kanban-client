@@ -38,8 +38,11 @@
           ref="orgContent"
           :OrgId="OrgId"
           :membersList="membersList"
+          :boardsList="boardsList"
           @inviteMember="inviteMember"
           @deleteMember="deleteMember"
+          @addBoard="addBoard"
+          @openBoard="openBoard"
         ></organization-content>
       </div>
     </div>
@@ -52,7 +55,7 @@ import OrganizationList from './OrganizationList';
 import OrganizationContent from './OrganizationContent';
 export default {
   components: { OrganizationForm, OrganizationList, OrganizationContent },
-  props: ['host', 'orgsList', 'membersList'],
+  props: ['host', 'orgsList', 'membersList', 'boardsList'],
   name: 'Home',
   data() {
     return {
@@ -85,10 +88,14 @@ export default {
     fetchMembers(id) {
       this.$emit('fetchMembers', id);
     },
+    fetchBoards(id) {
+      this.$emit('fetchBoards', id);
+    },
     showOrg(id) {
       this.OrgId = id;
       if (this.OrgId !== null) {
         this.fetchMembers(id);
+        this.fetchBoards(id);
       }
     },
     hideInviteForm() {
@@ -99,6 +106,12 @@ export default {
     },
     deleteMember(v) {
       this.$emit('deleteMember', v);
+    },
+    addBoard(body) {
+      this.$emit('addBoard', body);
+    },
+    openBoard(b) {
+      this.$emit('openBoard', b);
     },
   },
   mounted() {

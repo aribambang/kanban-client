@@ -30,15 +30,25 @@
       @showAlert="showAlert"
       @fetchOrganizations="fetchOrganizations"
       @fetchMembers="fetchMembers"
+      @fetchBoards="fetchBoards"
       @addOrg="addOrg"
       @deleteOrg="deleteOrg"
       :orgsList="orgsList"
       :membersList="membersList"
+      :boardsList="boardsList"
       @inviteMember="inviteMember"
       @deleteMember="deleteMember"
+      @addBoard="addBoard"
+      @openBoard="openBoard"
       ref="home"
     ></home>
-    <board v-else-if="activePage === 'Board'"></board>
+    <board
+      v-else-if="activePage === 'Board'"
+      :board="board"
+      :boardCategories="boardCategories"
+      @addTask="addTask"
+      ref="board"
+    ></board>
   </div>
 </template>
 
@@ -62,6 +72,9 @@ export default {
       messageAlert: '',
       orgsList: [],
       membersList: [],
+      boardsList: [],
+      boardCategories: [],
+      board: null,
     };
   },
   components: {
@@ -75,6 +88,11 @@ export default {
   methods: {
     changeActivePage(page) {
       this.activePage = page;
+    },
+    openBoard(b) {
+      this.board = b;
+      this.fetchBoardCategories(b.id);
+      this.changeActivePage('Board');
     },
     checkAuth() {
       if (localStorage.getItem('access_token')) {
@@ -179,7 +197,6 @@ export default {
         });
     },
     fetchMembers(id) {
-      console.log(id, 'members');
       axios({
         url: this.host + '/organizations/' + id + '/member',
         method: 'get',
@@ -208,6 +225,82 @@ export default {
         .then((response) => {
           this.showAlert({ t: 'success', m: response.data.message });
           this.fetchMembers(v.id);
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+
+    addBoard(body) {
+      axios({
+        url: this.host + '/boards',
+        method: 'post',
+        data: body,
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.showAlert({ t: 'success', m: 'Board has been created' });
+          this.$refs.home.hideOrgForm();
+          this.fetchBoards(body.OrganizationId);
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+
+    fetchBoards(id) {
+      axios({
+        url: this.host + '/boards/organization/' + id,
+        method: 'get',
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.boardsList = response.data;
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+    fetchBoardCategories(id) {
+      axios({
+        url: this.host + '/boards/' + id,
+        method: 'get',
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.boardCategories = response.data;
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+    addTask(body) {
+      axios({
+        url: this.host + '/tasks',
+        method: 'post',
+        data: body,
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.showAlert({ t: 'success', m: 'Task has been created' });
+          this.$refs.board.hideAddTask();
+          // this.fetchBoards(body.OrganizationId);
         })
         .catch((err) => {
           err.response.data.map((e) => {

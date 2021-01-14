@@ -103,6 +103,7 @@ export default {
           this.email = '';
           this.password = '';
           localStorage.setItem('access_token', response.data.access_token);
+          localStorage.setItem('id', response.data.id);
           localStorage.setItem(
             'full_name',
             `${response.data.first_name} ${response.data.last_name}`
@@ -126,6 +127,7 @@ export default {
       })
         .then((response) => {
           localStorage.setItem('access_token', response.data.access_token);
+          localStorage.setItem('id', response.data.id);
           localStorage.setItem(
             'full_name',
             `${response.data.first_name} ${response.data.last_name}`

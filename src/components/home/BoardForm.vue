@@ -1,13 +1,14 @@
 <template>
   <div v-if="boardFormActive === true" class="card" id="projectTodoForm">
     <div class="card-body">
-      <form onsubmit="addTodo(event, 1)">
+      <form @submit.prevent="addBoard">
         <input type="hidden" id="pProjectIdTodo" />
         <div class="form-group">
           <input
             type="text"
             class="form-control"
             id="pTitleTodo"
+            v-model="name"
             placeholder="Enter Board Name"
           />
         </div>
@@ -17,7 +18,7 @@
           </button>
           <button
             type="button"
-            onclick="hideProjectTodoForm()"
+            @click="hideBoardForm"
             class="btn btn-danger w-25"
           >
             Close
@@ -31,7 +32,26 @@
 <script>
 export default {
   name: 'BoardForm',
-  props: ['boardFormActive'],
+  props: ['boardFormActive', 'OrgId'],
+  data() {
+    return {
+      name: '',
+    };
+  },
+  methods: {
+    hideBoardForm() {
+      this.$emit('hideBoardForm');
+    },
+    addBoard() {
+      const body = {
+        name: this.name,
+        OrganizationId: this.OrgId,
+      };
+      this.$emit('addBoard', body);
+      this.name = '';
+      this.hideBoardForm();
+    },
+  },
 };
 </script>
 

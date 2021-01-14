@@ -29,10 +29,18 @@
     </div>
     <board-form
       :boardFormActive="boardFormActive"
+      :OrgId="OrgId"
       @hideBoardForm="hideBoardForm"
+      @addBoard="addBoard"
     ></board-form>
     <hr />
-    <div id="projectTodoList"></div>
+    <board-item
+      v-for="(board, index) in boardsList"
+      :key="board.id"
+      :board="board"
+      :index="index"
+      @openBoard="openBoard"
+    ></board-item>
   </div>
 </template>
 
@@ -40,11 +48,12 @@
 import BoardForm from './BoardForm';
 import InviteForm from './InviteForm';
 import MemberList from './MemberList';
+import BoardItem from './BoardItem';
 
 export default {
-  components: { InviteForm, BoardForm, MemberList },
+  components: { InviteForm, BoardForm, MemberList, BoardItem },
   name: 'OrganizationContent',
-  props: ['OrgId', 'membersList'],
+  props: ['OrgId', 'membersList', 'boardsList'],
   data() {
     return {
       inviteFormActive: false,
@@ -83,6 +92,12 @@ export default {
     },
     deleteMember(v) {
       this.$emit('deleteMember', v);
+    },
+    addBoard(body) {
+      this.$emit('addBoard', body);
+    },
+    openBoard(b) {
+      this.$emit('openBoard', b);
     },
   },
 };

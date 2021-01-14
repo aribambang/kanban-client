@@ -4,16 +4,14 @@
     <td>{{ member.User.first_name + ' ' + member.User.last_name }}</td>
     <td>{{ member.role }}</td>
     <td>
-      <button class="btn btn-primary" @click="changeRole(member.id)">
-        <i class="fa fa-edit"></i>
-      </button>
-      <button
-        v-if="member.role === 'member'"
-        @click="deleteMember(member.UserId)"
-        class="btn btn-danger"
-      >
-        <i class="fa fa-trash"></i>
-      </button>
+      <div>
+        <button class="btn btn-primary" @click="changeRole(member.id)">
+          <i class="fa fa-edit"></i>
+        </button>
+        <button @click="deleteMember(member.UserId)" class="btn btn-danger">
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
     </td>
   </tr>
 </template>
@@ -22,6 +20,11 @@
 export default {
   name: 'MemberItem',
   props: ['member', 'index', 'OrgId'],
+  data() {
+    return {
+      id: localStorage.getItem('id'),
+    };
+  },
   methods: {
     changeRole(id) {},
     deleteMember(member) {
