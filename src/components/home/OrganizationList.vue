@@ -3,7 +3,7 @@
     <th scope="row">{{ index + 1 }}</th>
     <td>{{ org.Organization.name }}</td>
     <td>
-      <button class="btn btn-primary" onclick="showProjectContent(${data.id})">
+      <button class="btn btn-primary" @click="showOrg(org.OrganizationId)">
         <i class="fa fa-eye"></i>
       </button>
       <button
@@ -18,13 +18,15 @@
 </template>
 
 <script>
-import axios from 'axios';
 export default {
   name: 'OrganizationList',
   props: ['index', 'org'],
   methods: {
     deleteOrg(id) {
       this.$emit('deleteOrg', id);
+    },
+    showOrg(id) {
+      this.$emit('showOrg', id);
     },
   },
 };

@@ -2,6 +2,8 @@
   <div>
     <navbar
       v-if="activePage !== 'Login' && activePage !== 'Register'"
+      :activePage="activePage"
+      @changeActivePage="changeActivePage"
       @logout="logout"
     ></navbar>
     <alert
@@ -27,11 +29,16 @@
       :host="host"
       @showAlert="showAlert"
       @fetchOrganizations="fetchOrganizations"
+      @fetchMembers="fetchMembers"
       @addOrg="addOrg"
       @deleteOrg="deleteOrg"
       :orgsList="orgsList"
+      :membersList="membersList"
+      @inviteMember="inviteMember"
+      @deleteMember="deleteMember"
       ref="home"
     ></home>
+    <board v-else-if="activePage === 'Board'"></board>
   </div>
 </template>
 
@@ -41,6 +48,7 @@ import Alert from './components/alert/Alert';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Home from './components/home/Home';
+import Board from './components/board/Board';
 import axios from 'axios';
 
 export default {
@@ -53,6 +61,7 @@ export default {
       typeAlert: '',
       messageAlert: '',
       orgsList: [],
+      membersList: [],
     };
   },
   components: {
@@ -61,6 +70,7 @@ export default {
     Register,
     Home,
     Navbar,
+    Board,
   },
   methods: {
     changeActivePage(page) {
@@ -100,16 +110,13 @@ export default {
         },
       })
         .then((response) => {
-          this.$emit('showAlert', {
-            t: 'success',
-            m: 'Organization has been created',
-          });
+          this.showAlert({ t: 'success', m: 'Organization has been created' });
           this.$refs.home.hideOrgForm();
           this.fetchOrganizations();
         })
         .catch((err) => {
           err.response.data.map((e) => {
-            this.$emit('showAlert', { t: 'error', m: e.message });
+            this.showAlert({ t: 'error', m: e.message });
           });
         });
     },
@@ -126,7 +133,7 @@ export default {
         })
         .catch((err) => {
           err.response.data.map((e) => {
-            this.$emit('showAlert', { t: 'error', m: e.message });
+            this.showAlert({ t: 'error', m: e.message });
           });
         });
     },
@@ -139,15 +146,72 @@ export default {
         },
       })
         .then((response) => {
-          this.$emit('showAlert', {
-            t: 'success',
-            m: response.data.message,
-          });
+          this.showAlert({ t: 'success', m: response.data.message });
           this.fetchOrganizations();
         })
         .catch((err) => {
           err.response.data.map((e) => {
-            this.$emit('showAlert', { t: 'error', m: e.message });
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+    inviteMember(v) {
+      axios({
+        url: this.host + '/organizations/' + v.id + '/member',
+        method: 'post',
+        data: v.body,
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.showAlert({
+            t: 'success',
+            m: 'Member has been invited to Organization',
+          });
+          this.$refs.home.hideInviteForm();
+          this.fetchMembers(v.id);
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+    fetchMembers(id) {
+      console.log(id, 'members');
+      axios({
+        url: this.host + '/organizations/' + id + '/member',
+        method: 'get',
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          console.log(response.data);
+          this.membersList = response.data;
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+    deleteMember(v) {
+      axios({
+        url: this.host + '/organizations/' + v.id + '/member/' + v.member,
+        method: 'delete',
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.showAlert({ t: 'success', m: response.data.message });
+          this.fetchMembers(v.id);
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
           });
         });
     },

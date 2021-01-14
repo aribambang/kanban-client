@@ -29,91 +29,18 @@
                 :org="org"
                 :index="index"
                 @deleteOrg="deleteOrg"
+                @showOrg="showOrg"
               ></organization-list>
             </tbody>
           </table>
         </div>
-        <div class="col-8" id="projectContent">
-          <h3>Boards:</h3>
-          <div class="mb-3">
-            <button
-              class="btn btn-primary w-25"
-              onclick="showProjectTodoForm()"
-            >
-              Add Boards
-            </button>
-            <button class="btn btn-primary w-25" onclick="showMemberForm()">
-              Invite Member
-            </button>
-          </div>
-          <div class="card" id="memberForm">
-            <div class="card-body">
-              <form onsubmit="member(event, 1)">
-                <input type="hidden" id="mProjectIdTodo" />
-                <div class="form-group">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="mEmail"
-                    placeholder="Enter Email"
-                  />
-                </div>
-                <div class="form-group">
-                  <button type="submit" class="btn btn-primary w-25">
-                    Add
-                  </button>
-                  <button
-                    type="button"
-                    onclick="hideMemberForm()"
-                    class="btn btn-danger w-25"
-                  >
-                    Close
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-          <div class="card" id="projectTodoForm">
-            <div class="card-body">
-              <form onsubmit="addTodo(event, 1)">
-                <input type="hidden" id="pProjectIdTodo" />
-                <div class="form-group">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="pTitleTodo"
-                    placeholder="Enter Title"
-                  />
-                </div>
-                <div class="form-group">
-                  <input type="date" class="form-control" id="pDateTodo" />
-                </div>
-                <div class="form-group">
-                  <textarea
-                    class="form-control"
-                    rows="5"
-                    id="pDescriptionTodo"
-                    placeholder="Enter Description"
-                  ></textarea>
-                </div>
-                <div class="form-group">
-                  <button type="submit" class="btn btn-primary w-25">
-                    Add
-                  </button>
-                  <button
-                    type="button"
-                    onclick="hideProjectTodoForm()"
-                    class="btn btn-danger w-25"
-                  >
-                    Close
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-          <hr />
-          <div id="projectTodoList"></div>
-        </div>
+        <organization-content
+          ref="orgContent"
+          :OrgId="OrgId"
+          :membersList="membersList"
+          @inviteMember="inviteMember"
+          @deleteMember="deleteMember"
+        ></organization-content>
       </div>
     </div>
   </div>
@@ -122,14 +49,16 @@
 <script>
 import OrganizationForm from './OrganizationForm';
 import OrganizationList from './OrganizationList';
+import OrganizationContent from './OrganizationContent';
 export default {
-  components: { OrganizationForm, OrganizationList },
-  props: ['host', 'orgsList'],
+  components: { OrganizationForm, OrganizationList, OrganizationContent },
+  props: ['host', 'orgsList', 'membersList'],
   name: 'Home',
   data() {
     return {
       full_name: localStorage.getItem('full_name'),
       orgFormActive: false,
+      OrgId: null,
     };
   },
   methods: {
@@ -152,6 +81,24 @@ export default {
     },
     fetchOrganizations() {
       this.$emit('fetchOrganizations');
+    },
+    fetchMembers(id) {
+      this.$emit('fetchMembers', id);
+    },
+    showOrg(id) {
+      this.OrgId = id;
+      if (this.OrgId !== null) {
+        this.fetchMembers(id);
+      }
+    },
+    hideInviteForm() {
+      this.$refs.orgContent.hideInviteForm();
+    },
+    inviteMember(v) {
+      this.$emit('inviteMember', v);
+    },
+    deleteMember(v) {
+      this.$emit('deleteMember', v);
     },
   },
   mounted() {
