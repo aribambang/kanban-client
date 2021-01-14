@@ -5,11 +5,14 @@
         <div class="col">
           <h2 id="hello">Hi, {{ full_name }}</h2>
           <button class="btn btn-primary w-50 mt-3" @click="showOrgForm">
-            Add Organization
+            Create Organization
           </button>
           <organization-form
             :orgFormActive="orgFormActive"
+            :host="host"
             @hideOrgForm="hideOrgForm"
+            @addOrg="addOrg"
+            @showAlert="showAlert"
           ></organization-form>
           <table class="table table-striped mt-3">
             <thead>
@@ -19,7 +22,15 @@
                 <th scope="col">Action</th>
               </tr>
             </thead>
-            <tbody id="projectList"></tbody>
+            <tbody>
+              <organization-list
+                v-for="(org, index) in orgsList"
+                :key="org.id"
+                :org="org"
+                :index="index"
+                @deleteOrg="deleteOrg"
+              ></organization-list>
+            </tbody>
           </table>
         </div>
         <div class="col-8" id="projectContent">
@@ -110,8 +121,10 @@
 
 <script>
 import OrganizationForm from './OrganizationForm';
+import OrganizationList from './OrganizationList';
 export default {
-  components: { OrganizationForm },
+  components: { OrganizationForm, OrganizationList },
+  props: ['host', 'orgsList'],
   name: 'Home',
   data() {
     return {
@@ -128,6 +141,21 @@ export default {
     hideOrgForm() {
       this.orgFormActive = false;
     },
+    showAlert({ t, m }) {
+      this.$emit('showAlert', { t, m });
+    },
+    addOrg(body) {
+      this.$emit('addOrg', body);
+    },
+    deleteOrg(id) {
+      this.$emit('deleteOrg', id);
+    },
+    fetchOrganizations() {
+      this.$emit('fetchOrganizations');
+    },
+  },
+  mounted() {
+    this.$emit('fetchOrganizations');
   },
 };
 </script>

@@ -22,7 +22,16 @@
       @changeActivePage="changeActivePage"
       @showAlert="showAlert"
     ></register>
-    <home v-else-if="activePage === 'Home'"></home>
+    <home
+      v-else-if="activePage === 'Home'"
+      :host="host"
+      @showAlert="showAlert"
+      @fetchOrganizations="fetchOrganizations"
+      @addOrg="addOrg"
+      @deleteOrg="deleteOrg"
+      :orgsList="orgsList"
+      ref="home"
+    ></home>
   </div>
 </template>
 
@@ -32,6 +41,7 @@ import Alert from './components/alert/Alert';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Home from './components/home/Home';
+import axios from 'axios';
 
 export default {
   name: 'App',
@@ -42,6 +52,7 @@ export default {
       activeAlert: false,
       typeAlert: '',
       messageAlert: '',
+      orgsList: [],
     };
   },
   components: {
@@ -78,6 +89,67 @@ export default {
       let auth2 = gapi.auth2.getAuthInstance();
       auth2.signOut().then(function () {});
       this.changeActivePage('Login');
+    },
+    addOrg(body) {
+      axios({
+        url: this.host + '/organizations',
+        method: 'post',
+        data: body,
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.$emit('showAlert', {
+            t: 'success',
+            m: 'Organization has been created',
+          });
+          this.$refs.home.hideOrgForm();
+          this.fetchOrganizations();
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.$emit('showAlert', { t: 'error', m: e.message });
+          });
+        });
+    },
+    fetchOrganizations() {
+      axios({
+        url: this.host + '/organizations',
+        method: 'get',
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.orgsList = response.data;
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.$emit('showAlert', { t: 'error', m: e.message });
+          });
+        });
+    },
+    deleteOrg(id) {
+      axios({
+        url: this.host + '/organizations/' + id,
+        method: 'delete',
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.$emit('showAlert', {
+            t: 'success',
+            m: response.data.message,
+          });
+          this.fetchOrganizations();
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.$emit('showAlert', { t: 'error', m: e.message });
+          });
+        });
     },
   },
   mounted() {
