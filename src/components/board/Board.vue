@@ -11,6 +11,8 @@
           :taskCategoriesList="taskCategoriesList"
           @addTask="addTask"
           @deleteTask="deleteTask"
+          @updateTask="updateTask"
+          @changeCatTask="changeCatTask"
           ref="cItem"
         ></category-item>
         <div class="col-2">
@@ -39,8 +41,14 @@ export default {
     deleteTask(id) {
       this.$emit('deleteTask', id);
     },
+    updateTask(body) {
+      this.$emit('updateTask', body);
+    },
     hideAddTask() {
       this.$refs.cItem.hideAddTask();
+    },
+    changeCatTask(v) {
+      this.$emit('changeCatTask', v);
     },
   },
 };

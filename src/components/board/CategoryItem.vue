@@ -6,11 +6,14 @@
       </div>
       <div class="card-body scrolling-wrapper">
         <task-item
-          v-for="(task, index) in category.Tasks"
+          v-for="(task, index) in filterTask"
           :key="index"
           :task="task"
           :category="category"
+          :taskCategoriesList="taskCategoriesList"
           @deleteTask="deleteTask"
+          @updateTask="updateTask"
+          @changeCatTask="changeCatTask"
         ></task-item>
       </div>
       <form>
@@ -49,7 +52,12 @@ export default {
     title: '',
   }),
   computed: {
-    filterCategory: function() {},
+    filterTask: function() {
+      let d = this.category.Tasks.sort(function(a, b) {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      });
+      return d;
+    },
   },
   methods: {
     showAddTask() {
@@ -69,6 +77,12 @@ export default {
     },
     deleteTask(id) {
       this.$emit('deleteTask', id);
+    },
+    changeCatTask(v) {
+      this.$emit('changeCatTask', v);
+    },
+    updateTask(body) {
+      this.$emit('updateTask', body);
     },
   },
 };

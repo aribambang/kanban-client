@@ -48,6 +48,8 @@
       :taskCategoriesList="taskCategoriesList"
       @addTask="addTask"
       @deleteTask="deleteTask"
+      @updateTask="updateTask"
+      @changeCatTask="changeCatTask"
       ref="board"
     ></board>
   </div>
@@ -309,7 +311,6 @@ export default {
         });
     },
     deleteTask(id) {
-      console.log(id);
       axios({
         url: this.host + '/tasks/' + id,
         method: 'delete',
@@ -319,6 +320,43 @@ export default {
       })
         .then((response) => {
           this.showAlert({ t: 'success', m: response.data.message });
+          this.fetchTask(this.board.id);
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+    updateTask(v) {
+      axios({
+        url: this.host + '/tasks/' + v.idTask,
+        method: 'put',
+        data: v.body,
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.showAlert({ t: 'success', m: 'Task has been updated' });
+          this.fetchTask(this.board.id);
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+    changeCatTask(v) {
+      axios({
+        url: this.host + '/tasks/' + v.id + '/category/' + v.idCat,
+        method: 'patch',
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.showAlert({ t: 'success', m: 'Task has been moved' });
           this.fetchTask(this.board.id);
         })
         .catch((err) => {
