@@ -1,14 +1,16 @@
 <template>
   <div id="board" v-if="board !== null">
     <div class="container-fluid">
-      <h1 class="mt-3">{{ board.name }}</h1>
+      <h1 class="my-4">{{ board.name }}</h1>
       <div class="scrolling-wrapper row flex-row flex-nowrap ">
         <category-item
-          v-for="(category, index) in boardCategories.Categories"
+          v-for="(category, index) in taskCategoriesList"
           :category="category"
           :index="index"
           :key="category.id"
+          :taskCategoriesList="taskCategoriesList"
           @addTask="addTask"
+          @deleteTask="deleteTask"
           ref="cItem"
         ></category-item>
         <div class="col-2">
@@ -29,10 +31,13 @@ import CategoryItem from './CategoryItem.vue';
 export default {
   components: { CategoryItem },
   name: 'Board',
-  props: ['board', 'boardCategories'],
+  props: ['board', 'taskCategoriesList'],
   methods: {
     addTask(body) {
       this.$emit('addTask', body);
+    },
+    deleteTask(id) {
+      this.$emit('deleteTask', id);
     },
     hideAddTask() {
       this.$refs.cItem.hideAddTask();

@@ -45,8 +45,9 @@
     <board
       v-else-if="activePage === 'Board'"
       :board="board"
-      :boardCategories="boardCategories"
+      :taskCategoriesList="taskCategoriesList"
       @addTask="addTask"
+      @deleteTask="deleteTask"
       ref="board"
     ></board>
   </div>
@@ -74,6 +75,7 @@ export default {
       membersList: [],
       boardsList: [],
       boardCategories: [],
+      taskCategoriesList: [],
       board: null,
     };
   },
@@ -92,6 +94,7 @@ export default {
     openBoard(b) {
       this.board = b;
       this.fetchBoardCategories(b.id);
+      this.fetchTask(b.id);
       this.changeActivePage('Board');
     },
     checkAuth() {
@@ -103,7 +106,6 @@ export default {
     },
     showAlert({ t, m }) {
       this.activeAlert = true;
-      console.log(t, m);
       this.typeAlert = t;
       this.messageAlert = m;
     },
@@ -205,7 +207,6 @@ export default {
         },
       })
         .then((response) => {
-          console.log(response.data);
           this.membersList = response.data;
         })
         .catch((err) => {
@@ -299,8 +300,43 @@ export default {
       })
         .then((response) => {
           this.showAlert({ t: 'success', m: 'Task has been created' });
-          this.$refs.board.hideAddTask();
-          // this.fetchBoards(body.OrganizationId);
+          this.fetchTask(this.board.id);
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+    deleteTask(id) {
+      console.log(id);
+      axios({
+        url: this.host + '/tasks/' + id,
+        method: 'delete',
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.showAlert({ t: 'success', m: response.data.message });
+          this.fetchTask(this.board.id);
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+    fetchTask(id) {
+      axios({
+        url: this.host + '/categories/board/' + id,
+        method: 'get',
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.taskCategoriesList = response.data;
         })
         .catch((err) => {
           err.response.data.map((e) => {

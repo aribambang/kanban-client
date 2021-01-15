@@ -5,20 +5,13 @@
         <b>{{ category.name }}</b>
       </div>
       <div class="card-body scrolling-wrapper">
-        <div class="card p-2 mb-3">
-          <h5>Titleasdasdasdasdasdasda</h5>
-          <p class="card-text">
-            <small class="text-muted"
-              ><i class="fa fa-calendar" aria-hidden="true"></i>
-              {{ moment(category.createdAt).format('DD MMMM YYYY') }}</small
-            >
-          </p>
-          <span class="text-muted "
-            ><i class="fa fa-edit" aria-hidden="true"></i>
-            <i class="fa fa-trash" aria-hidden="true"></i>
-            <i class="fa fa-arrows" aria-hidden="true"></i
-          ></span>
-        </div>
+        <task-item
+          v-for="(task, index) in category.Tasks"
+          :key="index"
+          :task="task"
+          :category="category"
+          @deleteTask="deleteTask"
+        ></task-item>
       </div>
       <form>
         <div v-if="addTaskFormActive === true" class="card p-1">
@@ -44,14 +37,20 @@
 
 <script>
 import moment from 'moment';
+import TaskItem from './TaskItem.vue';
 export default {
+  components: { TaskItem },
   name: 'CategoryItem',
-  props: ['category', 'index'],
+  props: ['category', 'index', 'taskCategoriesList'],
   data: () => ({
     moment: moment,
     addTaskFormActive: false,
+    taskList: [],
     title: '',
   }),
+  computed: {
+    filterCategory: function() {},
+  },
   methods: {
     showAddTask() {
       this.addTaskFormActive = true;
@@ -67,6 +66,9 @@ export default {
       this.$emit('addTask', body);
       this.title = '';
       this.hideAddTask();
+    },
+    deleteTask(id) {
+      this.$emit('deleteTask', id);
     },
   },
 };
