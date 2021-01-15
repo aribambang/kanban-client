@@ -50,6 +50,8 @@
       @deleteTask="deleteTask"
       @updateTask="updateTask"
       @changeCatTask="changeCatTask"
+      @addCategory="addCategory"
+      @deleteCategory="deleteCategory"
       ref="board"
     ></board>
   </div>
@@ -375,6 +377,43 @@ export default {
       })
         .then((response) => {
           this.taskCategoriesList = response.data;
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+    addCategory(body) {
+      axios({
+        url: this.host + '/categories',
+        method: 'post',
+        data: body,
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.showAlert({ t: 'success', m: 'Category has been created' });
+          this.fetchTask(this.board.id);
+        })
+        .catch((err) => {
+          err.response.data.map((e) => {
+            this.showAlert({ t: 'error', m: e.message });
+          });
+        });
+    },
+    deleteCategory(id) {
+      axios({
+        url: this.host + '/categories/' + id,
+        method: 'delete',
+        headers: {
+          authorization: 'Bearer ' + localStorage.getItem('access_token'),
+        },
+      })
+        .then((response) => {
+          this.showAlert({ t: 'success', m: response.data.message });
+          this.fetchTask(this.board.id);
         })
         .catch((err) => {
           err.response.data.map((e) => {

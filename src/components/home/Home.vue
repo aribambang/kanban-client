@@ -1,7 +1,7 @@
 <template>
   <div id="home">
     <div class="container">
-      <div class="row mt-5" id="projects">
+      <div class="row mt-5">
         <div class="col">
           <h2 id="hello">Hi, {{ full_name }}</h2>
           <button class="btn btn-primary w-50 mt-3" @click="showOrgForm">

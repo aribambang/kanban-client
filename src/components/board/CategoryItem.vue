@@ -2,7 +2,16 @@
   <div class="col-3">
     <div class="card maxh8">
       <div class="card-header">
-        <b>{{ category.name }}</b>
+        <div class="clearfix">
+          <div class="pull-left">
+            <b>{{ category.name }}</b>
+          </div>
+          <div class="pull-right">
+            <a class="text-right" href="#" @click="deleteCategory"
+              ><i class="fa fa-trash text-danger" aria-hidden="true"></i
+            ></a>
+          </div>
+        </div>
       </div>
       <div class="card-body scrolling-wrapper">
         <task-item
@@ -41,6 +50,7 @@
 <script>
 import moment from 'moment';
 import TaskItem from './TaskItem.vue';
+import Swal from 'sweetalert2';
 export default {
   components: { TaskItem },
   name: 'CategoryItem',
@@ -83,6 +93,21 @@ export default {
     },
     updateTask(body) {
       this.$emit('updateTask', body);
+    },
+    deleteCategory() {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$emit('deleteCategory', this.category.id);
+        }
+      });
     },
   },
 };

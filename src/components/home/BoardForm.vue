@@ -1,13 +1,12 @@
 <template>
-  <div v-if="boardFormActive === true" class="card" id="projectTodoForm">
+  <div v-if="boardFormActive === true" class="card">
     <div class="card-body">
       <form @submit.prevent="addBoard">
-        <input type="hidden" id="pProjectIdTodo" />
+        <input type="hidden" />
         <div class="form-group">
           <input
             type="text"
             class="form-control"
-            id="pTitleTodo"
             v-model="name"
             placeholder="Enter Board Name"
           />

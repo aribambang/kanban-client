@@ -1,5 +1,5 @@
 <template>
-  <div v-if="OrgId !== null" class="col-8" id="projectContent">
+  <div v-if="OrgId !== null" class="col-8">
     <h3>Organization</h3>
     <div class="mb-3">
       <button class="btn btn-primary w-25" @click="showInviteForm">

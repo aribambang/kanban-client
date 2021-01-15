@@ -1,7 +1,7 @@
 <template>
   <div class="card mb-3" @click="openBoard(board.id, board.name)">
     <div class="card-body">
-      <div id="todoCardValue-${data.id}">
+      <div>
         <h5 class="card-title">{{ index + 1 }}. {{ board.name }}</h5>
         <h6 class="card-subtitle mb-2 text-muted">
           <i class="fa fa-calendar" aria-hidden="true"></i>
