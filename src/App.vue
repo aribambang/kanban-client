@@ -65,6 +65,7 @@ import Register from './components/auth/Register';
 import Home from './components/home/Home';
 import Board from './components/board/Board';
 import axios from 'axios';
+import io from 'socket.io-client';
 
 export default {
   name: 'App',
@@ -81,6 +82,7 @@ export default {
       boardCategories: [],
       taskCategoriesList: [],
       board: null,
+      socket: io('localhost:3000'),
     };
   },
   components: {
@@ -104,6 +106,11 @@ export default {
     checkAuth() {
       if (localStorage.getItem('access_token')) {
         this.changeActivePage('Home');
+        this.socket.on('TASKS', (data) => {
+          if (data.boardId === this.board.id) {
+            this.taskCategoriesList = data.taskCategoriesList;
+          }
+        });
       } else {
         this.changeActivePage('Login');
       }
@@ -377,6 +384,10 @@ export default {
       })
         .then((response) => {
           this.taskCategoriesList = response.data;
+          this.socket.emit('UPDATE_TASK', {
+            taskCategoriesList: response.data,
+            boardId: this.board.id,
+          });
         })
         .catch((err) => {
           err.response.data.map((e) => {
